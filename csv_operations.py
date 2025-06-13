@@ -48,7 +48,7 @@ def csv_get_records(file_path: str):
         file_path (str): the path where to save the CSV file.
 
     Returns:
-        list: all record from
+        list: all record from the CSV file or a empty list in case of error.
 
     """
     records=[]
@@ -76,9 +76,9 @@ def csv_get_id(file_path: str, id: str):
     try:
         with open(file_path, mode="r", newline="", encoding="utf-8") as file:
             reader=csv.DictReader(file)
-        for i in reader:
-            if i["ID"]==id:
-                return i        
+            for i in reader:
+                if i["ID"]==id:
+                    return i        
         print(f"No records found with the id {id}.")
         return None
     except Exception as msg:
