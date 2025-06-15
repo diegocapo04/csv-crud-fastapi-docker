@@ -4,11 +4,12 @@ from csv_operations import *
 FILE_PATH = "csv_files/file.csv"
 
 class Item(BaseModel):
-    ID: str
+    ID: int
     nome: str
     cognome: str
     codice_fiscale: str
 
+'''
 def api_create():
     """
     Create a CSV file with default headers: 'ID', 'nome', 'cognome', 'codice_fiscale'.
@@ -24,6 +25,7 @@ def api_create():
         return {"message": "CSV file created", "file":FILE_PATH}
     except Exception as msg:
         return {"error": str(msg)}
+'''
     
 def api_add(item: Item):
     """
@@ -33,17 +35,16 @@ def api_add(item: Item):
         item (Item): the new record to add to the CSV file.
 
     Returns:
-        dict: a dictionary that contains a success message or an error message:
-            success: {'message': 'New record added to the CSV file','record':'<item>'}
-            error: {'error': '<error_message>'}
+        data (dict): the added recod as a dictionary or a message in case of error.
+
     """
     try:
-        csv_add(FILE_PATH,item)
-        return {"message":"New record added to the CSV file","record":item.model_dump()}
+        result = csv_add(FILE_PATH,item.model_dump())
+        return result
     except Exception as msg:
         return {"error": str(msg)}
     
-def api_get_records():
+def api_get_all_records():
     """
     Get all the record from the existing CSV file at the path 'csv_files/file.csv' using the csv_get_records() utility.
 
@@ -53,60 +54,70 @@ def api_get_records():
     """
     records=[]
     try:
-        records=csv_get_records(FILE_PATH)
+        records=csv_get_all_records(FILE_PATH)
         return records
     except Exception as msg:
         return []
     
-def api_get_id(id: str):
+def api_get_id(id: int):
     """
     Get a record by an ID from the existing CSV file at the path 'csv_files/file.csv' using the csv_get_id() utility.
 
     Parameters:
-        id (str): ID of the record to get.
+        id (int): ID of the record to get.
 
     Returns:
         dict: the record if found, None if not found or in case of error.
 
     """
     try:
-        return csv_get_id(FILE_PATH, id)
+        result = csv_get_id(FILE_PATH, id)
+        if result == None:
+            return {"Operation result": result}
+        else:
+            return result
     except Exception as msg:
-        return None
+        return {"error": str(msg)}
     
-def api_update(new_item: Item, id: str):
+def api_update(new_item: Item, id: int):
     """
     Update a record searched by an ID from the existing CSV file at the path 'csv_files/file.csv' using the csv_update() utility.
 
     Parameters:
         new_item (Item): a record with keys: 'ID', 'nome', 'cognome', 'codice_fiscale'.
-        id (str): ID of the record to search.
+        id (int): ID of the record to search.
 
     Returns:
-        bool: True if the record was updated successfully, False if not.
+        data (dict): the updated record as a dictionary or a message in case of error.
 
     """
     try:
-        return csv_update(FILE_PATH, id,new_item)
+        result = csv_update(FILE_PATH, id, new_item)
+
+        if result == None:
+            return {"Operation result": result}
+        else:
+            return result
     except Exception as msg:
-        return False
+        return {"error": str(msg)}
     
-def api_delete(id: str):
+def api_delete(id: int):
     """
     Delete a record searched by an ID from the existing CSV file at the path 'csv_files/file.csv' using the csv_delete() utility.
 
     Parameters:
         file_path (str): the path where to save the CSV file.
-        id (str): ID of the record to search.
+        id (int): ID of the record to search.
 
     Returns:
-        bool: True if the record was deleted successfully, False if not.
+        dict: a dictionary about the delete result
 
     """
     try:
-        return csv_delete(FILE_PATH, id)
+        flag = csv_delete(FILE_PATH, id)
+        return {"Delete result": flag}
     except Exception as msg:
-        return False
+        return {"Delete result": False}
 
 def api_get_rows():
     """
@@ -117,6 +128,7 @@ def api_get_rows():
 
     """
     try:
-        return csv_get_rows(FILE_PATH)
+        cnt = csv_get_rows(FILE_PATH)
+        return {"Operation result": cnt}
     except Exception as msg:
-        return None
+        return {"error": str(msg)}

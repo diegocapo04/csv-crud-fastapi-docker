@@ -1,5 +1,6 @@
 import csv
 
+'''
 def csv_create(file_path: str):
     """
     Create a CSV file with default headers: 'ID', 'nome', 'cognome', 'codice_fiscale'
@@ -17,6 +18,7 @@ def csv_create(file_path: str):
         print(f"CSV {file_path} created successfully.")
     except Exception as msg:
         print(f"Error creating CSV: {msg}.")
+'''
     
 def csv_add(file_path: str, record: dict):
     """
@@ -25,9 +27,21 @@ def csv_add(file_path: str, record: dict):
     Parameters:
         file_path (str): the path where to save the CSV file.
         record (dict): dictionary with keys: 'ID', 'nome', 'cognome', 'codice_fiscale'.
+    
+    Returns:
+        str: a message in case of error.
 
     """
     try:
+        id_list=[]
+        with open(file_path, mode="r", newline="", encoding="utf-8") as file:
+            records=list(csv.DictReader(file))
+            for i in records:
+                id_list.append(int(i["ID"]))
+            
+            if record["ID"] in id_list:
+                return {"Operation result": None}
+
         with open(file_path, mode="a", newline="", encoding="utf-8") as file:
             writer=csv.writer(file)
             writer.writerow([
@@ -36,11 +50,11 @@ def csv_add(file_path: str, record: dict):
                 record["cognome"],
                 record["codice_fiscale"]
             ])
-            print(f"Record with ID {record['ID']} added successfully.")
+        return record
     except Exception as msg:
-        print(f"Error writing record: {msg}.")
+        return {"error":str(msg)}
 
-def csv_get_records(file_path: str):
+def csv_get_all_records(file_path: str):
     """
     Get all the record from the existing CSV file.
 
@@ -57,46 +71,43 @@ def csv_get_records(file_path: str):
             reader=csv.DictReader(file)
             records=list(reader)
         return records
-    except Exception as msg:
-        print(f"Error while getting records: {msg}.")
+    except Exception:
         return []
     
-def csv_get_id(file_path: str, id: str):
+def csv_get_id(file_path: str, id: int):
     """
     Get a record by ID from the existing CSV file.
 
     Parameters:
         file_path (str): the path where to save the CSV file.
-        id (str): ID of the record to get.
+        id (int): ID of the record to get.
 
     Returns:
-        dict: the record if found, None if not found or in case of error.
+        dict: the record if found, None if not found or a message in case of error.
 
     """
     try:
         with open(file_path, mode="r", newline="", encoding="utf-8") as file:
             reader=csv.DictReader(file)
             for i in reader:
-                if i["ID"]==id:
+                if int(i["ID"])==id:
                     return i        
-        print(f"No records found with the id {id}.")
         return None
     except Exception as msg:
-        print(f"Error while getting record by ID: {msg}.")
-        return None
+        return {"error":str(msg)}
     
-def csv_update(file_path: str, id: str, new_data: dict):
+def csv_update(file_path: str, id: int, new_data: dict):
     """
     Update a record, searched by ID, from the existing CSV file.
     Then rewrites all the records in the CSV file to avoid data loss.
 
     Parameters:
         file_path (str): the path where to save the CSV file.
-        id (str): ID of the record to search.
+        id (int): ID of the record to search.
         new_data (dict): a dictionary with keys: 'ID', 'nome', 'cognome', 'codice_fiscale'.
 
     Returns:
-        bool: True if the record was updated successfully, False if not.
+        data (dict): the updated record as a dictionary or a message in case of error.
 
     """
     updated=False
@@ -105,14 +116,14 @@ def csv_update(file_path: str, id: str, new_data: dict):
             reader=csv.DictReader(file)
             records=list(reader)
         for i in records:
-            if i["ID"]==id:
+            if int(i["ID"])==id:
                 i.update(new_data)
+                updated_record=i
                 updated=True
                 break
         
         if updated==False:
-            print(f"No records found with the id {id}.")
-            return False
+            return None
         
         with open(file_path, mode="w", newline="", encoding="utf-8") as file:    
             fieldnames = ["ID", "nome", "cognome", "codice_fiscale"]
@@ -120,21 +131,19 @@ def csv_update(file_path: str, id: str, new_data: dict):
             writer.writeheader()
             writer.writerows(records)
 
-        print(f"Record with ID {id} updated successfully.")
-        return True
+        return updated_record
     
     except Exception as msg:
-        print(f"Error while updating records: {msg}.")
-        return False
+        return {"error": str(msg)}
     
-def csv_delete(file_path: str, id: str):
+def csv_delete(file_path: str, id: int):
     """
     Delete a record, searched by ID, from the existing CSV file.
     Then rewrites all the records in the CSV file to avoid data loss.
 
     Parameters:
         file_path (str): the path where to save the CSV file.
-        id (str): ID of the record to search.
+        id (int): ID of the record to search.
 
     Returns:
         bool: True if the record was deleted successfully, False if not.
@@ -146,13 +155,12 @@ def csv_delete(file_path: str, id: str):
             reader= csv.DictReader(file)
             records=list(reader)
         for i in records:
-            if i["ID"]==id:
+            if int(i["ID"])==id:
                 records.remove(i)
                 deleted=True
                 break
 
         if deleted==False:
-            print(f"No records found with the id {id}.")
             return False
         
         with open(file_path, mode="w", newline="", encoding="utf-8") as file:    
@@ -161,11 +169,9 @@ def csv_delete(file_path: str, id: str):
             writer.writeheader()
             writer.writerows(records)
 
-        print(f"Record with ID {id} deleted successfully.")
         return True
 
     except Exception as msg:
-        print(f"Error while deleting record: {msg}.")
         return False
     
 def csv_get_rows(file_path: str):
@@ -176,15 +182,14 @@ def csv_get_rows(file_path: str):
         file_path (str): the path where to save the CSV file.
 
     Returns:
-        int: numbers of CSV file's rows.
+        int: numbers of CSV file's rows or a message in case of error.
 
     """
     cnt=0
     try:
         with open(file_path, mode="r", newline="", encoding="utf-8") as file:
             reader= csv.DictReader(file)
-            return sum(1 for _ in reader)
+            return len(list(reader))
         
     except Exception as msg:
-        print(f"Error while counting rows: {msg}.")
-        return None
+        return {"error": str(msg)}
