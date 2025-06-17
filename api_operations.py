@@ -9,23 +9,6 @@ class Item(BaseModel):
     cognome: str
     codice_fiscale: str
 
-'''
-def api_create():
-    """
-    Create a CSV file with default headers: 'ID', 'nome', 'cognome', 'codice_fiscale'.
-    The function creates a CSV file at the path 'csv_files/file.csv' using the csv_create() utility.
-
-    Returns:
-        dict: a dictionary that contains a success message or an error message:
-            success: {'message': 'CSV file created', 'file': '<file_path>'}
-            error: {'error': '<error_message>'}
-    """
-    try:
-        csv_create(FILE_PATH)
-        return {"message": "CSV file created", "file":FILE_PATH}
-    except Exception as msg:
-        return {"error": str(msg)}
-'''
     
 def api_add(item: Item):
     """

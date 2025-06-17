@@ -1,24 +1,4 @@
 import csv
-
-'''
-def csv_create(file_path: str):
-    """
-    Create a CSV file with default headers: 'ID', 'nome', 'cognome', 'codice_fiscale'
-
-    Parameters:
-        file_path (str): the path where to save the CSV file.
-
-    """
-    columns=["ID","nome","cognome","codice_fiscale"]
-
-    try:
-        with open(file_path, mode="w", newline="", encoding="utf-8") as file:
-            writer=csv.writer(file)
-            writer.writerow(columns)
-        print(f"CSV {file_path} created successfully.")
-    except Exception as msg:
-        print(f"Error creating CSV: {msg}.")
-'''
     
 def csv_add(file_path: str, record: dict):
     """
